@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+.fulldiv {
+    @apply flex flex-col h-full;
+}
+.maindiv {
+    @apply h-screen w-full overflow-hidden p-2;
+}
+.autocomplete-list {
+    @apply mt-1 flex flex-col items-start justify-start space-y-0.5 w-64;
+}
+.autocomplete-list-item {
+    @apply border w-full rounded-2xl p-1 hover:outline-black hover:outline cursor-pointer;
+}
+.clear-button {
+    @apply absolute right-5 cursor-pointer rounded-xl hover:font-bold hidden;
+}
+.autocomplete-input {
+    @apply rounded-2xl border p-2;
+}
+.input-div {
+    @apply relative flex w-64 items-center;
+}
+.search-div {
+    @apply h-1/5 flex flex-col items-center justify-center;
+}
