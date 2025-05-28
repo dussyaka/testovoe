@@ -1,0 +1,59 @@
+services:
+ django-web:
+   build: .
+   entrypoint: /app/entrypoint.sh
+   restart: unless-stopped
+   container_name: django
+   volumes:
+     - static_volume:/app/static
+   depends_on:
+    - postgres
+   expose:
+     - 8000
+   env_file:
+     - ./prod.env
+   deploy:       
+    resources:         
+      limits:           
+        cpus: '0.5'           
+        memory: 256M
+ nginx:
+   image: nginx:latest
+   container_name: nginx
+   restart: unless-stopped
+   ports:
+     - "80:80"
+   volumes:
+     - static_volume:/static
+     - ./nginx.conf:/etc/nginx/nginx.conf
+     - ./web/media:/files
+   depends_on:
+    - django-web
+   deploy:       
+    resources:         
+      limits:           
+        cpus: '0.5'           
+        memory: 256M
+ postgres:
+   image: postgres:17
+   container_name: django-pg
+   restart: unless-stopped
+   expose:
+     - 5432
+   environment:
+    - POSTGRES_USER=django
+    - POSTGRES_PASSWORD=a36kja87sde94rouf9sda
+    - POSTGRES_DB=weather
+   volumes:
+    - postgres_data:/var/lib/postgresql/data
+    - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+   deploy:    
+    resources:         
+      limits:           
+        cpus: '0.5'           
+        memory: 256M
+
+volumes:
+ static_volume:
+ postgres_data:
+ 

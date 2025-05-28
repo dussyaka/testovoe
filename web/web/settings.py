@@ -11,21 +11,24 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+ENV_MODE = True if os.environ.get('ENV_MODE') else False
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fx&6lq7wi#)0$4ng6%1p+*#&tf72%+(!kjc69@&2b9!gd&j+fd'
+SECRET_KEY = 'django-insecure-fx&6lq7wi#)0$4ng6%1p+*#&tf72%+(!kjc69@&2b9!gd&j+fd' if not ENV_MODE else os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if not ENV_MODE else int(os.environ.get('DEBUG', '0'))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [] if not ENV_MODE else os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost 127.0.0.1 [::1]').split()
 
 
 # Application definition
@@ -76,8 +79,12 @@ WSGI_APPLICATION = 'web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'weather' if not ENV_MODE else os.environ.get('POSTGRES_DB'),
+        'USER': 'postgres' if not ENV_MODE else os.environ.get('POSTGRES_USER'),
+        'PASSWORD': '123'  if not ENV_MODE else os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'localhost' if not ENV_MODE else os.environ.get('POSTGRES_HOST'),
+        'PORT': 5432 if not ENV_MODE else os.environ.get('POSTGRES_PORT'),
     }
 }
 

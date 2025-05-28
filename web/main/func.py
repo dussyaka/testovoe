@@ -6,7 +6,7 @@ from geopy import Nominatim
 from datetime import datetime
 
 def geo(text):
-    geolocator = Nominatim(user_agent="meteo_app")
+    geolocator = Nominatim(user_agent="zhizhaindawidnow")
     location = geolocator.geocode(text)
     return location.latitude, location.longitude
 
@@ -55,11 +55,11 @@ def meteo(latitude, longitude):
 
     for i in range(0,4):
         hourly_dict[i] = {
-            'temp': hourly.Variables(0).Values(i),
+            'temp': round(hourly.Variables(0).Values(i), 2),
             'humidity': hourly.Variables(1).Values(i),
             'feeltemp': round(hourly.Variables(2).Values(i), 2),
             'pressure': round(hourly.Variables(6).Values(i), 1),
-            'precipitation': hourly.Variables(4).Values(i),
+            'precipitation': hourly.Variables(4).Values(i) * 100,
             'wind': round(hourly.Variables(5).Values(i), 1),
         }
 

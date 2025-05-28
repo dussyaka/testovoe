@@ -1,6 +1,11 @@
 $(document).ready(function () {
 
+    let history = $('#placesList li').map(function() {
+        return $(this).text();
+    }).get();
+
     function getWeather(place) {
+        if (!place) return;
         $.ajax({
             url: links.get_weather,
             method: 'GET',
@@ -11,6 +16,7 @@ $(document).ready(function () {
             success: function(response) {
                 if (response.status === 'success') {
                     updateInfo(response.data);
+                    history = response.history;
                 };
             },
             error: function(xhr, status, error) {
@@ -33,7 +39,7 @@ $(document).ready(function () {
         $soonWeatherContainer.empty();
         for (let i = 0; i <= 3; i++) {
             $soonWeatherContainer.append(
-                `<div data-id="${i}" class="hour-weather flex-1 rounded-lg border p-1">
+                `<div data-id="${i}" class="hour-weather">
                     <p>Температура: ${near[i].temp}°С</p>
                     <p>Ощущается как: ${near[i].feeltemp}°С</p>
                     <p>Влажность: ${near[i].humidity}%</p>
@@ -45,7 +51,36 @@ $(document).ready(function () {
         }
         $('#currentWeatherContainer').show();
         $('#futureWeatherContainer').show();
+    };
+
+    function updateList(cities) {
+        const $list = $('#placesList');
+        $list.empty();
+        cities.forEach(function(city) {
+            $list.append(`<li class="autocomplete-list-item">${city}</li>`)
+        })
     }
+
+    function getCities(query) {
+        $.ajax({
+            url: links.get_cities,
+            method: 'GET',
+            data: {
+                'query': query.trim()
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    updateList(response.cities);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Ошибка:', error);
+            }
+        })
+    };
+
+
 
     $('#searchInput').keydown(function (e) { 
         if (e.key === 'Enter') {
@@ -55,25 +90,32 @@ $(document).ready(function () {
 
     $('#placesList').on('click', 'li', function() {
         getWeather($(this).text());
-        $('#searchInput').val('');
+        $('#searchInput').val($(this).text());
         $('#placesList').empty();
-        $('#searchInputClear').hide();  
+        $('#searchInputClear').show();  
     })
 
     $('#searchInputClear').click(function() {
         $('#placesList').empty();
         $('#searchInput').val('').focus();
         $(this).hide();
+        history.forEach(function(place) {
+            $('#placesList').append(`<li class="autocomplete-list-item">${place}</li>`)
+        })
     })
 
     $('#searchInput').on('input', function(){
 
-        if ($(this).val().length > 0) {
+        let query = $(this).val();
+
+        if (query.length > 0) {
             $('#searchInputClear').show();
+            getCities(query);
         }
         else {
             $('#searchInputClear').hide();
         }
+
     })
 
 });
