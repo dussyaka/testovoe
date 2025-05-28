@@ -1,5 +1,5 @@
 # Запуск
-docker compose up
+docker compose up (docker compose up --build)
 # Реализовано
 - docker container + docker compose
 - сделаны автодополнение (подсказки) при вводе города
